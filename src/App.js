@@ -24,9 +24,7 @@ function App() {
        ...inputs,
        [name]: value
      });
-    },
-    [inputs]
-  );
+    },[]);
 
   //기존에 쌓여있던 더미 데이터
   const [users, setUsers] = useState([
@@ -82,8 +80,8 @@ function App() {
         username,
         email
       };
-      setUsers([...users, user]);
-      //setUsers(users.concat(user)); 이렇게 concat써도 됨(새로운배열)
+      // setUsers(users => [...users, user]);
+      setUsers(users => users.concat(user));
 
 
       setInputs({
@@ -92,25 +90,27 @@ function App() {
       });
 
       nextId.current += 1;
-    }, 
-    [users, username, email] 
+    }, [username, email] 
     //users의 active가 바뀐다고 onCreate함수 다시 만들필요없다.(users통째로 넣을 필요없다)
     //🔥안에서 쓰고 있는 state나 props들 deps에 넣어준다고 생각하면 된다.
   )
 
   const onRemove = useCallback(
     id => {
-      setUsers(users.filter((user) => user.id !== id))
-    },
-    [users]
+      setUsers(
+        users => users.filter((user) => user.id !== id)
+      )
+    },[]
   )
 
   const onToggle = useCallback(
     id => {
-     setUsers(users.map((user) => 
-        user.id === id ?  { ...user, active: !user.active } : user
-      ))
-    }, [users]
+      setUsers(users => 
+        users.map((user) => 
+          user.id === id ?  { ...user, active: !user.active } : user
+        )
+      )
+    }, []
   )
   /*
     🔥 useCallback 은 특정 함수를 새로 만들지 않고 재사용하고 싶을때 사용한다.
@@ -127,6 +127,28 @@ function App() {
     랜더링 최적화 부분과는 관계가 없어, 눈으로 뭐가 더 좋은건지 딱히 티도 안나고 알수도 없다.
     (비록 알고보면 좋아진것이긴 하지만)
     눈에 띄게 좋아질려면 useCallback에 추가작업이 필요하다!!
+
+    예를 들어 지금 users가 바뀌면 useCallback으로 함수를 다시 만들어주기로 했는데,
+    그럼 실질적으로 다시 만들 필요없는 함수들도 users가 바뀌면 다시 생긴다는 이야기
+    예를들어
+    아이디를 클릭해서 users의 active 상태를 바꿔주는 행위는 users배열을 변화시키고 있지만,
+    사실 onCreate, onToggle, onRemove 함수들을 다시 만들 필욘 없다.
+    (그 함수들이 다시 만들어지면 그 함수들을 props로 받고있는 컴포넌트도 리랜더링된다.)
+
+    이때!!! 
+    🔥 deps에 state(users)를 제외시키고 함수형 setState (함수형 업데이트)로 바꾼다!
+    원칙은 useCallback 안에서 쓰는 state는 deps에 넣어줘야 state참조가 가능했지만,
+    함수형 업데이트를 해주면, 그 자체만으로도 이전 state를 참조 및 비교해올 수 있기 떄문에!!!
+
+    다시말해
+    useCallback으로 함수의 재생산을 막았지만, 여전히 deps로 인한 리랜더링이 발생한다.
+    때문에 useCallback의 종속성 배열을 비워주고 함수형 업데이트를 이용해 값을 참조한다.
+
+    🔥 이제까지 나온 최적화 포인트
+    💡 useMemo로 불필요한 재연산 방지하기
+    💡 useCallback으로 불필요한 함수 재생산 방지하기
+    💡 React.memo로 props가 바뀌지 않는한, 불필요한 자식컴포넌트의 리랜더링 방지하기
+    💡 useCallback의 종속성 컴포넌트 최소화[] + 함수형 state로 함수 재생산 추가로 최소화하기
   */
 
 

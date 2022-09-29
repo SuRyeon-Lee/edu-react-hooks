@@ -6,7 +6,9 @@
 
 import React, {useEffect} from "react";
 
-function User({user, onRemove, onToggle}){
+//🔥 export 안 하는 컴포넌트는 이런식으로 정의할 때 감싸버린다.
+//컴포넌트 만드는 함수 자체를 감싸고 변수로 만들어버린다.
+const User = React.memo(function User({user, onRemove, onToggle}){
     /*
     🔥 useEffect 에서 return 하는 함수 = cleanup 함수
     useEffect 에 대한 뒷정리를 해준다.
@@ -59,7 +61,7 @@ function User({user, onRemove, onToggle}){
             <button onClick={() => onRemove(user.id)}>삭제</button>
         </div>
     )
-}
+})
 
 function UserList({users, onRemove, onToggle}){
     
@@ -74,4 +76,4 @@ function UserList({users, onRemove, onToggle}){
     )
 }
 
-export default UserList
+export default React.memo(UserList);
