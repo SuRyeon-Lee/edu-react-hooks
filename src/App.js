@@ -1,7 +1,7 @@
 // 여러개의 input 상태 관리하기 (https://react.vlpt.us/basic/09-multiple-inputs.html)
 import ManyInputs from './lesson/ManyInputs'
 
-import {useRef, useState, useMemo} from "react";
+import {useRef, useState, useMemo, useCallback} from "react";
 import UserList from './lesson/UserList'
 import CreateUser from './lesson/CreateUser';
 
@@ -17,13 +17,16 @@ function App() {
     email: ''
   });
   const { username, email } = inputs;
-  const onChange = e => {
-    const { name, value } = e.target;
-    setInputs({
-      ...inputs,
-      [name]: value
-    });
-  };
+  const onChange = useCallback( 
+    e => {
+     const { name, value } = e.target;
+     setInputs({
+       ...inputs,
+       [name]: value
+     });
+    },
+    [inputs]
+  );
 
   //기존에 쌓여있던 더미 데이터
   const [users, setUsers] = useState([
@@ -72,34 +75,60 @@ function App() {
 
   const nextId = useRef(4);
   // let nextId = 4; 이런식으로 해보니까 제대로 변수가 처리되지 않더라
-  const onCreate = () => {
-    // 배열에 항목 추가하는 로직
-    const user = {
-      id: nextId.current, //useRef로 저장해둔 외부변수 current로 빼온다.
-      username,
-      email
-    };
-    setUsers([...users, user]);
-    //setUsers(users.concat(user)); 이렇게 concat써도 됨(새로운배열)
+  const onCreate = useCallback( () => {
+      // 배열에 항목 추가하는 로직
+      const user = {
+        id: nextId.current, //useRef로 저장해둔 외부변수 current로 빼온다.
+        username,
+        email
+      };
+      setUsers([...users, user]);
+      //setUsers(users.concat(user)); 이렇게 concat써도 됨(새로운배열)
 
 
-    setInputs({
-      username: '',
-      email: ''
-    });
+      setInputs({
+        username: '',
+        email: ''
+      });
 
-    nextId.current += 1;
-  };
+      nextId.current += 1;
+    }, 
+    [users, username, email] 
+    //users의 active가 바뀐다고 onCreate함수 다시 만들필요없다.(users통째로 넣을 필요없다)
+    //🔥안에서 쓰고 있는 state나 props들 deps에 넣어준다고 생각하면 된다.
+  )
 
-  const onRemove = (id) => {
-    setUsers(users.filter((user) => user.id !== id))
-  }
+  const onRemove = useCallback(
+    id => {
+      setUsers(users.filter((user) => user.id !== id))
+    },
+    [users]
+  )
 
-  const onToggle = id => {
-    setUsers(users.map((user) => 
-      user.id === id ?  { ...user, active: !user.active } : user
-    ))
-  }
+  const onToggle = useCallback(
+    id => {
+     setUsers(users.map((user) => 
+        user.id === id ?  { ...user, active: !user.active } : user
+      ))
+    }, [users]
+  )
+  /*
+    🔥 useCallback 은 특정 함수를 새로 만들지 않고 재사용하고 싶을때 사용한다.
+    사실 위에 컴포넌트 안에서 선언된 함수들,
+    (onChange,onCreate,onRemove,onToggle)
+    이것들은 전부 랜더링 될때마다 새로 만들어지는 중이다. 
+    성능 최적화를 위해 한번 만들어놓으면 재사용하는 것이 필수!
+
+    이때 
+    🔥 함수 안에서 사용하는 상태 혹은 props 가 있다면 꼭, deps 배열안에 포함시켜야 한다.
+
+    사실 useCallback은 우리 눈에 보이지 않는 영역에서
+    함수를 저장해 주는 부분을 최적화시키는 것이어서
+    랜더링 최적화 부분과는 관계가 없어, 눈으로 뭐가 더 좋은건지 딱히 티도 안나고 알수도 없다.
+    (비록 알고보면 좋아진것이긴 하지만)
+    눈에 띄게 좋아질려면 useCallback에 추가작업이 필요하다!!
+  */
+
 
   /*
     🔥 useMemo는 상관 없는 컴포넌트의 변화에 딸려서 함수가 호출될때 사용한다. 
