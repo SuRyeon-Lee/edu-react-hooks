@@ -25,17 +25,20 @@ function App() {
     {
         id: 1,
         username: '칠칠이',
-        email: 'cute772@zoogle.com'
+        email: 'cute772@zoogle.com',
+        active: true
     },
     {
         id: 2,
         username: '밥좀주소',
-        email: 'BabJwo@zoogle.com'
+        email: 'BabJwo@zoogle.com',
+        active: false
     },
     {
         id: 3,
         username: '대식곰',
-        email: 'salmonHunter@zoogle.com'
+        email: 'salmonHunter@zoogle.com',
+        active: false
     },
   ])
 
@@ -87,6 +90,12 @@ function App() {
     setUsers(users.filter((user) => user.id !== id))
   }
 
+  const onToggle = id => {
+    setUsers(users.map((user) => 
+      user.id === id ?  { ...user, active: !user.active } : user
+    ))
+  }
+
   return (
     <>
      {/* <ManyInputs/> */}
@@ -100,7 +109,7 @@ function App() {
      />
 
      {/* 기존에 쌓여있던 더미 데이터 뿌리기 */}
-     <UserList users={users} onRemove={onRemove}/>
+     <UserList users={users} onRemove={onRemove} onToggle={onToggle}/>
     </>
   );
 }

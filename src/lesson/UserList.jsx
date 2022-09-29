@@ -6,22 +6,33 @@
 
 import React from "react";
 
-function User({user, onRemove}){
+function User({user, onRemove, onToggle}){
     return (
         <div>
-            <b>{user.username}</b> <span>({user.email})</span>
+            <b
+                //🔥 인라인 스타일은 객체로 넣어야 한다.  
+                style={{
+                    cursor: 'pointer',
+                    // user.active의 상태에 따라 색을 바꿈
+                    color: user.active ? 'green' : 'black'
+                }}
+                onClick={()=>onToggle(user.id)}
+            >
+                {user.username}
+            </b>
+            <span>({user.email})</span>
             <button onClick={() => onRemove(user.id)}>삭제</button>
         </div>
     )
 }
 
-function UserList({users, onRemove}){
+function UserList({users, onRemove, onToggle}){
     
     return (
         <>
             <div>
                 {users.map(user => (
-                    <User user={user} key={user.id} onRemove={onRemove}/>
+                    <User user={user} key={user.id} onRemove={onRemove} onToggle={onToggle}/>
                 ))}
             </div>
         </>
