@@ -83,6 +83,10 @@ function App() {
     nextId.current += 1;
   };
 
+  const onRemove = (id) => {
+    setUsers(users.filter((user) => user.id !== id))
+  }
+
   return (
     <>
      {/* <ManyInputs/> */}
@@ -96,7 +100,7 @@ function App() {
      />
 
      {/* 기존에 쌓여있던 더미 데이터 뿌리기 */}
-     <UserList users={users}/>
+     <UserList users={users} onRemove={onRemove}/>
     </>
   );
 }
