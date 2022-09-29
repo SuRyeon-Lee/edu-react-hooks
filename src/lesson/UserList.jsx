@@ -23,14 +23,14 @@ function User({user, onRemove, onToggle}){
     // }, []); //deps(dependency array) 가 빈배열 : 컴포넌트가 처음 나타날때에만 호출
 
 
-    useEffect(() => {
-        console.log('user 값이 설정됨');
-        console.log(user);
-        return () => {
-          console.log('user 가 바뀌기 전..');
-          console.log(user);
-        };
-    }, [user]);
+    // useEffect(() => {
+    //     console.log('user 값이 설정됨');
+    //     console.log(user);
+    //     return () => {
+    //       console.log('user 가 바뀌기 전..');
+    //       console.log(user);
+    //     };
+    // }, [user]);
     //🔥 useEffect 안에서 사용하는 상태나, props 가 있다면, useEffect 의 deps 에 넣어줘야 한다.
     /*
         🤔 deps(dependency array) 가 빈배열 아닐때

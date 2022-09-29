@@ -1,9 +1,14 @@
 // 여러개의 input 상태 관리하기 (https://react.vlpt.us/basic/09-multiple-inputs.html)
 import ManyInputs from './lesson/ManyInputs'
 
-import {useRef, useState} from "react";
+import {useRef, useState, useMemo} from "react";
 import UserList from './lesson/UserList'
 import CreateUser from './lesson/CreateUser';
+
+function countActiveUsers(users) {
+  console.log('활성 사용자 수를 세는중...');
+  return users.filter(user => user.active).length;
+}
 
 function App() {
   //Input 처리하는 친구들
@@ -96,6 +101,16 @@ function App() {
     ))
   }
 
+  /*
+    🔥 useMemo는 상관 없는 컴포넌트의 변화에 딸려서 함수가 호출될때 사용한다. 
+    useMemo의 의미와 기능은 ...
+    "이 state가 바뀔때만 함수를 호출해서 다시 계산해주면 돼!
+    근데 이 state 안바뀌었으면 함수 호출하지마!
+    내가 이전에 연산한 값 저장해놨거든~ 그거 주면돼!"
+
+    const [연산값 저장할 변수] = useMemo(() => [어떻게 연산할지 정의하는 함수], [deps 배열])
+  */
+  const count = useMemo(() => countActiveUsers(users), [users]);
   return (
     <>
      {/* <ManyInputs/> */}
@@ -110,6 +125,7 @@ function App() {
 
      {/* 기존에 쌓여있던 더미 데이터 뿌리기 */}
      <UserList users={users} onRemove={onRemove} onToggle={onToggle}/>
+     <div>활성사용자 수 : {count}</div>
     </>
   );
 }
