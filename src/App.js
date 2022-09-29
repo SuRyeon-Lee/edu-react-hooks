@@ -145,10 +145,10 @@ function App() {
     때문에 useCallback의 종속성 배열을 비워주고 함수형 업데이트를 이용해 값을 참조한다.
 
     🔥 이제까지 나온 최적화 포인트
-    💡 useMemo로 불필요한 재연산 방지하기
-    💡 useCallback으로 불필요한 함수 재생산 방지하기
+    💡 useMemo로 불필요한 재연산 방지하기 (https://react.vlpt.us/basic/17-useMemo.html)
+    💡 useCallback으로 불필요한 함수 재생산 방지하기 (https://react.vlpt.us/basic/18-useCallback.html)
     💡 React.memo로 props가 바뀌지 않는한, 불필요한 자식컴포넌트의 리랜더링 방지하기
-    💡 useCallback의 종속성 컴포넌트 최소화[] + 함수형 state로 함수 재생산 추가로 최소화하기
+    💡 useCallback의 종속성 컴포넌트 최소화[] + 함수형 state로 함수 재생산 추가로 최소화하기(https://react.vlpt.us/basic/19-React.memo.html)
   */
 
 
