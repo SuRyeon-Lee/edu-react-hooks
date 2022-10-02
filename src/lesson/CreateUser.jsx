@@ -28,7 +28,7 @@ const CreateUser = ({ username, email, onChange, onCreate }) => {
         value={email}
       />
       <button onClick={onCreate}>등록</button>
-    </div>
+    </div> 
   );
 }
 
