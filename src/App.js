@@ -4,6 +4,7 @@ import ManyInputs from './lesson/ManyInputs'
 import {useRef, useState, useMemo, useCallback, useReducer} from "react";
 import UserList from './lesson/UserList'
 import CreateUser from './lesson/CreateUser';
+import useInputs from './hooks/useInputs';
 
 function countActiveUsers(users) {
   console.log('활성 사용자 수를 세는중...');
@@ -19,10 +20,11 @@ user 목록을 객체들이 묶인 베열로 관리하던 users state
 마치 class 컴포넌트에서 state를 관리하는 것처럼 설정해준다.
 */
 const initialState = {
-  inputs: {
-    username: '',
-    email: ''
-  },
+  //🔥 이제 inputs와 관련된 값은 useInputs 커스텀 훅에서 관리
+  // inputs: {
+  //   username: '',
+  //   email: ''
+  // },
 
   users:[
     {
@@ -48,14 +50,15 @@ const initialState = {
 
 function reducer(state, action) { //이제 state를 바꾸던 함수로직들이 모두 reducer로 관리됨
   switch(action.type) {
-    case 'CHANGE_INPUT' : //기존의 onChange함수
-      return {
-        ...state,
-        inputs: {
-          ...state.inputs,
-          [action.name]: action.value //새로들어온 action.name과 action.value로 기존 state바꿈
-        }
-      }
+    //🔥 이제 inputs와 관련된 값은 useInputs 커스텀 훅에서 관리
+    // case 'CHANGE_INPUT' : //기존의 onChange함수
+    //   return {
+    //     ...state,
+    //     inputs: {
+    //       ...state.inputs,
+    //       [action.name]: action.value //새로들어온 action.name과 action.value로 기존 state바꿈
+    //     }
+    //   }
     case 'CREATE_USER' :
       return {
         inputs: initialState.inputs, //새로 추가한 후에는 input칸 비워주기
@@ -79,20 +82,26 @@ function reducer(state, action) { //이제 state를 바꾸던 함수로직들이
 }
 
 function App() {
+  // [{바뀐 state값}, onChange함수, reset함수]
+  const [{ username, email}, onChange, reset] = useInputs({
+    username: '',
+    email: '',
+  })
   const [state, dispatch] = useReducer(reducer, initialState)
   const nextId = useRef(4);
 
   const { users } = state; //initial state의 구조 = {users:[{},{}], inputs:{username:valuem email:vlaue}}
-  const { username, email } = state.inputs;
-
-  const onChange = useCallback(e => { //useCallback으로 함수는 처음 한번 만들어놓고 꺼내다 쓰겠다 결정!
-    const { name,value } = e.target;
-    dispatch({
-      type: 'CHANGE_INPUT',
-      name,
-      value
-    })
-  }, [])
+  
+  //🔥 이제 inputs와 관련된 값은 useInputs 커스텀 훅에서 관리
+  // const { username, email } = state.inputs;
+  // const onChange = useCallback(e => { //useCallback으로 함수는 처음 한번 만들어놓고 꺼내다 쓰겠다 결정!
+  //   const { name,value } = e.target;
+  //   dispatch({
+  //     type: 'CHANGE_INPUT',
+  //     name,
+  //     value
+  //   })
+  // }, [])
 
   const onCreate = useCallback(e => {
     dispatch({
@@ -103,6 +112,7 @@ function App() {
         email
       }
     });
+    reset();
     nextId.current += 1;
   }, [username, email]);
 
