@@ -88,12 +88,12 @@ export const UserDispatch = React.createContext(null)
 
 function App() {
   // [{바뀐 state값}, onChange함수, reset함수]
-  const [{ username, email}, onChange, reset] = useInputs({
-    username: '',
-    email: '',
-  })
+  // const [{ username, email}, onChange, reset] = useInputs({
+  //   username: '',
+  //   email: '',
+  // })
   const [state, dispatch] = useReducer(reducer, initialState)
-  const nextId = useRef(4);
+  // const nextId = useRef(4);
 
   const { users } = state; //initial state의 구조 = {users:[{},{}], inputs:{username:valuem email:vlaue}}
   
@@ -108,34 +108,34 @@ function App() {
   //   })
   // }, [])
 
-  const onCreate = useCallback(e => {
-    dispatch({
-      type: 'CREATE_USER',
-      user: {
-        id: nextId.current,
-        username,
-        email
-      }
-    });
-    reset();
-    nextId.current += 1;
-  }, [username, email]);
+  // const onCreate = useCallback(e => {
+  //   dispatch({
+  //     type: 'CREATE_USER',
+  //     user: {
+  //       id: nextId.current,
+  //       username,
+  //       email
+  //     }
+  //   });
+  //   reset();
+  //   nextId.current += 1;
+  // }, [username, email]);
 
-  const  onToggle = useCallback(id => {
-    dispatch({
-      type: 'TOGGLE_USER',
-      id
-    }) 
-    //기존의 set함수 쓸땐, 이전 state값을 참조하기 위해서 함수형으로 set함수 작성했어야 했다.
-    //하지만 이젠 로직을 분리해서 reducer에서 관리하기 때문에, 그런 지저분한 부분들을 다 떨굴 수 있다.
-  }, [])
+  // const  onToggle = useCallback(id => {
+  //   dispatch({
+  //     type: 'TOGGLE_USER',
+  //     id
+  //   }) 
+  //   //기존의 set함수 쓸땐, 이전 state값을 참조하기 위해서 함수형으로 set함수 작성했어야 했다.
+  //   //하지만 이젠 로직을 분리해서 reducer에서 관리하기 때문에, 그런 지저분한 부분들을 다 떨굴 수 있다.
+  // }, [])
 
-  const onRemove = useCallback(id => {
-    dispatch({
-      type: 'REMOVE_USER',
-      id
-    })
-  }, [])
+  // const onRemove = useCallback(id => {
+  //   dispatch({
+  //     type: 'REMOVE_USER',
+  //     id
+  //   })
+  // }, [])
   
   //활성 사용자수 세기
   const count = useMemo(() => countActiveUsers(users), [users]);
@@ -154,7 +154,7 @@ function App() {
 
     */}
       <UserDispatch.Provider value={dispatch}>
-        <CreateUser username={username} email={email} onChange={onChange} onCreate={onCreate}/>
+        <CreateUser/>
         <UserList users={users}/>
         <div>활성사용자 수 : {count}</div>
       </UserDispatch.Provider>
