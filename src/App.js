@@ -1,6 +1,6 @@
 // 여러개의 input 상태 관리하기 (https://react.vlpt.us/basic/09-multiple-inputs.html)
 import ManyInputs from './lesson/ManyInputs'
-
+import React from "react";
 import {useRef, useState, useMemo, useCallback, useReducer} from "react";
 import UserList from './lesson/UserList'
 import CreateUser from './lesson/CreateUser';
@@ -81,6 +81,11 @@ function reducer(state, action) { //이제 state를 바꾸던 함수로직들이
   }
 }
 
+//🔥 컴포넌트 바깥에 Context를 만들고 변수로 할당한다.
+//React.createContext( 값을 따로 지정하지 않을 경우 사용되는 기본 값 )
+//export는 다른 외부 파일에서도 접근할 수 있도록 하기 위해서
+export const UserDispatch = React.createContext(null)
+
 function App() {
   // [{바뀐 state값}, onChange함수, reset함수]
   const [{ username, email}, onChange, reset] = useInputs({
@@ -136,9 +141,23 @@ function App() {
   const count = useMemo(() => countActiveUsers(users), [users]);
   return (
     <>
-      <CreateUser username={username} email={email} onChange={onChange} onCreate={onCreate}/>
-      <UserList users={users} onToggle={onToggle} onRemove={onRemove} />
-      <div>활성사용자 수 : {count}</div>
+    {/* 
+      🔥 UserDispatch 라는 Context를 감싸 어디서든 dispatch를 꺼내 쓸 수 있도록 준비해줌 
+      Context를 만들면 이 Context안에 Provider라는 컴포넌트가 들어있는데,
+      이 Provider를 통해서 Context의 값을 정할 수 있다.
+
+      value는 전역으로 관리할 값을 넣어준다.
+      useReducer로 App의 state업데이트 로직 관리하고,
+      그 로직 함수를 자식 컴포넌트한테 props drilling으로 물려주고 있는데,
+      💡 액션을 보내서 state를 업데이트하는 dispatch 함수 자체를 전역으로 관리하면
+      드릴링이 필요없을 것이다!
+
+    */}
+      <UserDispatch.Provider value={dispatch}>
+        <CreateUser username={username} email={email} onChange={onChange} onCreate={onCreate}/>
+        <UserList users={users}/>
+        <div>활성사용자 수 : {count}</div>
+      </UserDispatch.Provider>
     </>
   );
 }
